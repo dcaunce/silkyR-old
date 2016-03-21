@@ -1,0 +1,57 @@
+---
+name: Descriptives
+title: Descriptives
+
+results:
+    - name: descriptives
+      title: Descriptives
+      type: Table
+      rows: (vars)
+      
+      columns:
+        - name: name
+          title: ""
+          content: (name)
+          format: text
+        
+        - name: mean
+          title: Mean
+          format: number
+          visible: (mean)
+        
+        - name: median
+          title: Median
+          format: number
+          visible: (median)
+
+    - name: frequencies
+      title: Frequencies
+      type: Tables
+      visible: (freq)
+      
+      tables: (vars)
+      
+      template:
+          title: Frequencies of {name}
+          type: Table
+          visible: (levels(name))
+          
+          rows: (levels(name))
+          
+          columns:
+            - name: level
+              title: Level
+              format: text
+              content: (name)
+              
+            - name: counts
+              title: Counts
+              format: text
+              
+            - name: percentage
+              title: "%"
+              format: text
+
+            - name: total
+              title: Total
+              format: text
