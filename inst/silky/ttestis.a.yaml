@@ -1,0 +1,18 @@
+---
+name:       TTestIS
+namespace:  silkyR
+engineType: R
+
+options:
+    - name: dataset
+      type: Dataset
+      description: >
+        The data set as a data frame
+
+    - name: vars
+      title: Variables
+      type: Variables
+      description: >
+        The variables of interest
+      
+

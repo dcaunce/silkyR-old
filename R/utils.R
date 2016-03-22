@@ -39,7 +39,7 @@ loadAnalysisInfo <- function(packageName, analysisName) {
         
     } else {
 
-        location <- system.file("silky", paste0(analysisName, ".a.yaml"), package=packageName)
+        location <- system.file("silky", paste0(tolower(analysisName), ".a.yaml"), package=packageName)
         info <- yaml::yaml.load_file(location)
 
         .analysisInfoCache[[name]] <- info
@@ -52,13 +52,13 @@ loadResultsInfo <- function(packageName, analysisName) {
     
     name <- paste0(packageName, "::", analysisName)
     
-    if (name %in% names(.analysisInfoCache)) {
+    if (name %in% names(.resultsInfoCache)) {
         
         info <- .resultsInfoCache[[name]]
         
     } else {
         
-        location <- system.file("silky", paste0(analysisName, ".r.yaml"), package=packageName)
+        location <- system.file("silky", paste0(tolower(analysisName), ".r.yaml"), package=packageName)
         info <- yaml::yaml.load_file(location)
         
         .resultsInfoCache[[name]] <- info

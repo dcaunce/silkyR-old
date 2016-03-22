@@ -19,3 +19,5 @@ Collate: utils.R
     compiler.R
     descriptives.b.R
     descriptives.h.R
+    ttestis.h.R
+    ttestis.b.R

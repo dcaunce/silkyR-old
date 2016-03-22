@@ -1,0 +1,25 @@
+---
+name: TTestIS
+title: Independent Samples T-Test
+
+results:
+    - name: ttest
+      title: Independent Samples T-Test
+      type: Table
+      rows: (vars)
+      
+      columns:
+        - name: name
+          title: ""
+          content: (name)
+          format: text
+        
+        - name: t
+          format: number
+        
+        - name: df
+          format: number
+
+        - name: p
+          format: number
+
