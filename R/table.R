@@ -81,7 +81,7 @@ Table <- setRefClass(
             for (columnDef in columnDefs) {
                 
                 if (is.null(columnDef$title))
-                    columnDef$title <- name
+                    columnDef$title <- columnDef$name
                 if (is.null(columnDef$content))
                     columnDef$content <- "."
                 if (is.null(columnDef$visible))

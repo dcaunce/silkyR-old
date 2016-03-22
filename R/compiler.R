@@ -2,7 +2,7 @@
 silkyC <- function(path=".") {
 
     inputPath <- paste(path, "inst", "silky", sep="/")
-    inputFiles <- list.files(inputPath, "*.a.yaml", full.names=TRUE)
+    inputFiles <- list.files(inputPath, "*.a.yaml$", full.names=TRUE)
     
     if (length(inputFiles) == 0)
         stop(paste("No .a.yaml files could be found at:", inputPath), call. = FALSE)
@@ -72,7 +72,7 @@ generateSrcJS <- function(path, info) {
     content <- format("{content}// This file is an automatically generated template, it will not be subsequently\n", content=content)
     content <- format("{content}// overwritten by the compiler, and may be edited\n", content=content)
     
-    content <- format("{content}\nvar options = require('./{name}.options')", name=info$name, content=content)
+    content <- format("{content}\nvar options = require('./{name}.options')", name=tolower(info$name), content=content)
     
     con <- file(filepath)
     writeLines(content, con)
@@ -162,7 +162,7 @@ generateBody <- function(path, info) {
     content <- format("{content}# This file is an automatically generated template, it will not be subsequently\n", content=content)
     content <- format("{content}# overwritten by the compiler, and may be edited\n\n", content=content)
     
-    content <- format("{content}{package}.{name} <- setRefClass(\n", package=info$namespace, name=info$name, content=content)
+    content <- format("{content}{name} <- setRefClass(\n", package=info$namespace, name=info$name, content=content)
     content <- format("{content}  \"{name}\",\n", name=info$name, content=content)
     content <- format("{content}  contains=\"Analysis\",\n", name=info$name, content=content)
     content <- format("{content}  methods=list(", content=content)
