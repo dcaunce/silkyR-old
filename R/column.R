@@ -3,17 +3,17 @@ Cell <- setRefClass(
     "Cell",
     fields=list(
         value="ANY",
-        sups="integer"),
+        sups="numeric"),
     methods=list(
         initialize=function(v=NA) {
             value <<- v
-            sups <<- integer()
+            sups <<- numeric()
         },
         setValue=function(v) {
             value <<- v
         },
         addSup=function(sup) {
-            sups <<- c(sups, as.integer(sup))
+            sups <<- c(sups, sup)
         },
         asProtoBuf=function() {
             initProtoBuf()

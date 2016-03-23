@@ -275,25 +275,45 @@ Table <- setRefClass(
             cat('\n')
             for (i in seq_along(.footnotes$.notes)) {
                 
-                note <- .footnotes$.notes[[i]]
+                # determine if the corresponding superscript is visible
                 
-                lines <- strwrap(note, width=(wid-.padding-2))
-                first <- TRUE
+                supVisible <- FALSE
                 
-                for (line in lines) {
-                    cat(.marstr)
-                    
-                    if (first) {
-                        cat(.SUPCHARS[i])
-                        cat(' ')
-                        first <- FALSE
-                    } else {
-                        cat('  ')
+                for (column in .columns) {
+                    if (column$visible()) {
+                        for (cell in column$.cells) {
+                            if ((i-1) %in% cell$sups) {
+                                supVisible <- TRUE
+                                break()
+                            }
+                        }
                     }
+                    if (supVisible)
+                        break()
+                }
+                
+                if (supVisible) {
+                
+                    note <- .footnotes$.notes[[i]]
                     
-                    cat(line)
-                    cat(.marstr)
-                    cat('\n')
+                    lines <- strwrap(note, width=(wid-.padding-2))
+                    first <- TRUE
+                    
+                    for (line in lines) {
+                        cat(.marstr)
+                        
+                        if (first) {
+                            cat(.SUPCHARS[i])
+                            cat(' ')
+                            first <- FALSE
+                        } else {
+                            cat('  ')
+                        }
+                        
+                        cat(line)
+                        cat(.marstr)
+                        cat('\n')
+                    }
                 }
                 
             }
