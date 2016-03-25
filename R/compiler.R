@@ -196,10 +196,23 @@ generateHeader <- function(path, info) {
 
     for (option in info$options) {
     
-        if ("default" %in% names(option))
-            content <- format("{content}{sep}\n  {name} = {def}", name=option$name, def=option$default, content=content, sep=sep, context="R")
-        else
+        if ("default" %in% names(option)) {
+            
+            if (is.null(option$default))
+                def <- "NULL"
+            else if (is.logical(option$default))
+                def <- ifelse(option$default, "TRUE", "FALSE")
+            else if (option$type == "List")
+                def <- paste0('"', option$def, '"')
+            else
+                def <- option$default
+            
+            content <- format("{content}{sep}\n  {name} = {def}", name=option$name, def=def, content=content, sep=sep)
+            
+        } else {
+            
             content <- format("{content}{sep}\n  {name}", name=option$name, content=content, sep=sep, context="R")
+        }
         
         sep <- ","
     }
@@ -214,7 +227,7 @@ generateHeader <- function(path, info) {
     }
     content <- format("{content})\n\n", content=content)
 
-    content <- format("{content}  analysis <- {name}(options)\n", name=info$name, content=content)
+    content <- format("{content}  analysis <- {name}(options=options)\n", name=info$name, content=content)
     content <- format("{content}  analysis$init()\n", content=content)
     content <- format("{content}  analysis$run()\n", content=content)
     content <- format("{content}\n  analysis\n", content=content)

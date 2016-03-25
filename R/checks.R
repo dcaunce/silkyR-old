@@ -19,6 +19,8 @@ check <- function(packageName, analysisName, options) {
             checkInt(value, opt, dataset)
         } else if (opt$type == "Variables") {
             checkVariables(value, opt, dataset)
+        } else if (opt$type == "List") {
+            checkList(value, opt, dataset)
         }
     }
 }
@@ -33,6 +35,14 @@ checkBool <- function(value, info, dataset=NULL) {
 
     if (length(value) == 1 && value != FALSE && value != TRUE)
         reject("Argument '{a}' must be either TRUE or FALSE", code="a_must_be_true_or_false", a=info$name)
+}
+
+checkList <- function(value, info, dataset=NULL) {
+    
+    if ( ! (value %in% info$options)) {
+        options <- paste("'", info$options, "'", collapse=", ", sep="")
+        reject("Argument '{a}' must be one of {options}", code="a_must_be_one_of", a=info$name, options=options)
+    }
 }
 
 checkInt <- function(value, info, dataset=NULL) {
