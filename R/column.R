@@ -110,16 +110,21 @@ Column <- setRefClass(
         visible=function() {
             .options$eval(.visibleExpr)
         },
-        printTitle=function() {
-            w   <- nchar(.title)
-            pad <- spaces(max(0, width() - w))
+        printTitle=function(width=NULL) {
+            if (is.null(width))
+                width <- .self$width()
+            w <- nchar(.title)
+            pad <- spaces(max(0, width - w))
             cat(paste0(.title, pad))
         },
-        printCell=function(i) {
+        printCell=function(i, measures=NULL) {
             if ( ! .measured)
                 .measure()
             
-            cat(silkyFormatElement(.cells[[i]], w=.width, dp=.measures$dp, sf=.measures$sf, expw=.measures$expwidth, supw=.measures$supwidth))
+            if (is.null(measures))
+                measures <- .measures
+            
+            cat(silkyFormatElement(.cells[[i]], w=measures$width, dp=measures$dp, sf=measures$sf, expw=measures$expwidth, supw=measures$supwidth))
         },
         asProtoBuf=function() {
             initProtoBuf()
