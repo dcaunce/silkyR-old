@@ -194,11 +194,17 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
             
             maxstr <- max(maxstr, nchar(elem))
         }
-        else if (is.numeric(elem) == FALSE) {
+        else if ( ! is.numeric(elem)) {
             
             maxstr <- 2 + nchar(class(elem)[1])
         }
+        else if (elem == 0) {
+            
+            dp <- max(dp, sf-1)
+        }
         else if (abs(elem) > scl && abs(elem) < sch) {
+            
+            # non-scientific values
             
             dp <- max(dp, (sf - floor(log10(abs(elem))) - 1))
             
@@ -208,6 +214,8 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
             }
             
         } else {
+            
+            # scientific values
             
             exp <- floor(log10(abs(elem)))
             if (abs(exp) > maxsexp) {
@@ -221,7 +229,11 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
             maxsupwidth <- max(maxsupwidth, 1 + length(sups))
     }
     
-    nswidth <- max(1, floor(log10(abs(maxns)))+1)
+    if (maxns == 0)
+        nswidth <- 1
+    else
+        nswidth <- max(1, floor(log10(abs(maxns)))+1)
+    
     if (maxnss == '-')
         nswidth <- nswidth + 1
     if (dp > 0)
@@ -281,11 +293,15 @@ silkyFormatElement <- function(elem, w=NULL, expw=NULL, supw=0, dp=2, sf=3, scl=
         
         str <- paste0("[", class(elem)[1], "]")
         
-    } else if (abs(elem) > scl && abs(elem) < sch) {
+    } else if (elem == 0 || (abs(elem) > scl && abs(elem) < sch)) {
+        
+        # non-scientific values
 
         str <- sprintf(paste0("%", w, ".", dp, "f"), elem)
         
     } else {
+        
+        # scientific values
         
         exponent <- floor(log10(abs(elem)))
         
