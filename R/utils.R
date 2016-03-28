@@ -163,13 +163,13 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
     
     dp <- 0
     maxns <- 0   # max non-scientific value
-    maxnss <- '+'  # max non-scientific value sign
+    minns <- 0
     
     maxsexp <- 1  # max (abs) scientific exponent
     maxsexps <- '+'  # max scientific exponent sign
     maxsms <- '+' # max scientific mantissa sign
     
-    maxstr <- 0
+    maxstr <- 4
     
     maxsupwidth <- 0
     
@@ -208,10 +208,10 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
             
             dp <- max(dp, (sf - floor(log10(abs(elem))) - 1))
             
-            if (abs(elem) > maxns) {
-                maxns <- abs(elem)
-                maxnss <- ifelse(elem >= 0, '+', '-')
-            }
+            if (elem > maxns)
+                maxns <- elem
+            if (elem < minns)
+                minns <- elem
             
         } else {
             
@@ -229,13 +229,19 @@ silkyMeasureElements <- function(elems, sf=3, scl=1e-3, sch=1e7) {
             maxsupwidth <- max(maxsupwidth, 1 + length(sups))
     }
     
-    if (maxns == 0)
+    if (maxns != 0 || minns != 0) {
+        
+        maxnsw <- max(1, floor(log10(maxns))+1)
+        minnsw <- max(1, floor(log10(abs(minns)))+1)
+        if (minns < 0)
+            minnsw = minnsw + 1  # for minus sign
+        
+        nswidth <- max(maxnsw, minnsw)
+        
+    } else {
         nswidth <- 1
-    else
-        nswidth <- max(1, floor(log10(abs(maxns)))+1)
-    
-    if (maxnss == '-')
-        nswidth <- nswidth + 1
+    }
+        
     if (dp > 0)
         nswidth <- nswidth + 1 + dp # add a decimal point
     

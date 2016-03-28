@@ -38,13 +38,15 @@ Table <- setRefClass(
         .padding="numeric",
         .marstr="character",
         .padstr="character",
-        .footnotes="Footnotes"),
+        .footnotes="Footnotes",
+        .swapRowsColumns="logical"),
     methods=list(
-        initialize=function(name="", index=0, options=Options()) {
+        initialize=function(name="", index=0, options=Options(), swapRowsColumns=FALSE) {
             
             callSuper(name=name, options=options)
             
             .index <<- as.integer(index)
+            .swapRowsColumns <<- swapRowsColumns
             .columns <<- list()
             .rowCount <<- 0
             .rowsExpr <<- "1"
@@ -221,22 +223,72 @@ Table <- setRefClass(
             .columns[[colNo]]$.addSup(rowNo, index)
         },
         width=function() {
-            w <- 0
+            
+            if ( ! .swapRowsColumns) {
+                
+                w <- 0
+                for (column in .columns) {
+                    if (column$visible())
+                        w <- w + .padding + column$width() + .padding
+                }
+                
+            } else {
+                
+                w <- .padding + .widthWidestHeader() + .padding
+                for (i in 1:.rowCount)
+                    w <- w + .padding + .widthWidestCellInRow(i)$width + .padding
+            }
+            
+            max(w, nchar(.title))
+        },
+        .widthWidestCellInRow=function(row) {
+            
+            maxWidthWOSup <- 0
+            maxSupInRow <- 0  # widest superscripts
+            
+            for (column in .columns) {
+                if (column$visible()) {
+                    cell <- column$.getCell(row)
+                    measurements <- silkyMeasureElements(list(cell))
+                    widthWOSup <- measurements$width - measurements$supwidth
+                    maxWidthWOSup <- max(maxWidthWOSup, widthWOSup)
+                    maxSupInRow <- max(maxSupInRow, measurements$supwidth)
+                }
+            }
+            
+            list(width=maxWidthWOSup + maxSupInRow, supwidth=maxSupInRow)
+        },
+        .widthWidestHeader=function() {
+            width <- 0
+            
             for (column in .columns) {
                 if (column$visible())
-                    w <- w + .padding + column$width() + .padding
+                    width <- max(width, nchar(column$.title))
             }
-            max(w, nchar(.title))
+            
+            width
         },
         show=function() {
             cat('\n')
             printTitle()
             printHeaders()
             i <- 1
-            while (i <= .rowCount) {
-                printRow(i)
-                i <- i + 1
+            
+            if ( ! .self$.swapRowsColumns) {
+            
+                for (i in seq_len(.rowCount))
+                    printRow(i)
+
+            } else {
+                
+                for (i in seq_along(.columns)) {
+                    if (i == 1)
+                        next()  # the first is already printed in the header
+                    if (.columns[[i]]$visible())
+                        printRow(i)
+                }
             }
+                
             printFooter()
             cat('\n')
         },
@@ -253,11 +305,31 @@ Table <- setRefClass(
         printHeaders=function() {
             wid <- width()
             cat(.marstr)
-            for (column in .columns) {
-                if (column$visible()) {
-                    cat(.padstr)
-                    column$printTitle()
-                    cat(.padstr)
+            
+            if ( ! .swapRowsColumns) {
+            
+                for (column in .columns) {
+                    if (column$visible()) {
+                        cat(.padstr)
+                        column$printTitle()
+                        cat(.padstr)
+                    }
+                }
+                
+            } else {
+                
+                column <- .columns[[1]]
+                
+                cat(.padstr)
+                cat(spaces(.widthWidestHeader()))
+                cat(.padstr)
+                
+                for (i in 1:.rowCount) {
+                    text <- paste(column$.getCell(i)$value)
+                    rowWidth <- .widthWidestCellInRow(i)$width
+                    w <- nchar(text)
+                    pad <- spaces(max(0, rowWidth - w))
+                    cat(paste0(.padstr, text, pad, .padstr))
                 }
             }
             cat(.marstr)
@@ -320,12 +392,40 @@ Table <- setRefClass(
         },
         printRow=function(i) {
             cat(.marstr)
-            for (column in .columns) {
-                if (column$visible()) {
+            
+            if ( ! .swapRowsColumns) {
+            
+                for (column in .columns) {
+                    if (column$visible()) {
+                        cat(.padstr)
+                        column$printCell(i)
+                        cat(.padstr)
+                    }
+                }
+                
+            } else {
+                
+                column <- .columns[[i]]
+                
+                width <- .widthWidestHeader()
+                cat(.padstr)
+                column$printTitle(width)
+                cat(.padstr)
+                
+                for (j in seq_along(column$.cells)) {
+                    widest <- .widthWidestCellInRow(j)
+                    width <- widest$width
+                    supwidth <- widest$supwidth
+                    
                     cat(.padstr)
-                    column$printCell(i)
+                    cell <- column$.cells[[j]]
+                    measurements <- silkyMeasureElements(list(cell))
+                    measurements$width <- max(measurements$width, width)
+                    measurements$supwidth  <- supwidth
+                    column$printCell(j, measurements)
                     cat(.padstr)
                 }
+                
             }
             cat(.marstr)
             cat('\n')
