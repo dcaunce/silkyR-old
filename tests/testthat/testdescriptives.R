@@ -8,24 +8,8 @@ desc <- silkyDescriptives(data, c("x", "y", "z"), median=TRUE, mode=TRUE, skew=T
 #print(desc)
 
 # Test descriptives table numerical values
-expect_equal(4.75, desc$results()$get("descriptives")$getCell(2, "mean")$value)
-expect_equal(4, desc$results()$get("descriptives")$getCell(2, "mode")$value)
-expect_equal(57, desc$results()$get("descriptives")$getCell(2, "sum")$value)
-expect_equal(sd(y), desc$results()$get("descriptives")$getCell(2, "sd")$value)
-expect_equal(var(y), desc$results()$get("descriptives")$getCell(2, "variance")$value)
-expect_equal(9, desc$results()$get("descriptives")$getCell(2, "range")$value)
-expect_equal(0, desc$results()$get("descriptives")$getCell(2, "min")$value)
-expect_equal(9, desc$results()$get("descriptives")$getCell(2, "max")$value)
-expect_equal(sqrt(var(y)/12), desc$results()$get("descriptives")$getCell(2, "se")$value)
-
-deviation <- y-mean(y)
-expect_equal(sum(deviation^3)/(12*sd(y)^3), desc$results()$get("descriptives")$getCell(2, "skew")$value)
-expect_equal(sum(deviation^4)/(12*var(y)^2), desc$results()$get("descriptives")$getCell(2, "kurt")$value)
-
-expect_equivalent(3, desc$results()$get("descriptives")$getCell(2, "quart1")$value)
-expect_equivalent(4, desc$results()$get("descriptives")$getCell(2, "quart2")$value)
-expect_equivalent(8, desc$results()$get("descriptives")$getCell(2, "quart3")$value)
-expect_equal(0, desc$results()$get("descriptives")$getCell(3, "mean")$value)
+expect_output(desc$results()$get("descriptives"), "\n Descriptives                                     \n ──────────────────────────────────────────────── \n                      x       y           z       \n ──────────────────────────────────────────────── \n   Mean                         4.75       0.00   \n   Median                       4.00       0.00   \n   Mode                         4.00 ᵃ    -2.00   \n   Minimum                      0.00      -3.00   \n   Maximum                      9.00       3.00   \n   Skewness                   -0.127      0.104   \n   Kurtosis                     1.58       1.19   \n   25th percentile              3.00      -2.00   \n   50th percentile              4.00       0.00   \n   75th percentile              8.00       1.75   \n ──────────────────────────────────────────────── \n ᵃ More than one mode exists, only the first \n   is reported \n", fixed=TRUE)
+expect_output(desc$results()$get("frequencies"), " Frequencies\n\n Frequencies of x                            \n ─────────────────────────────────────────── \n   Level    Counts    %       Cumulative %   \n ─────────────────────────────────────────── \n   a       4.00    33.3     33.3   \n   b       4.00    33.3     66.7   \n   c       4.00    33.3    100.0   \n ─────────────────────────────────────────── \n", fixed=TRUE)
 
 # Test footnote appearance
 expect_true(!length(desc$results()$get("descriptives")$getCell(1, "mode")$sups))
