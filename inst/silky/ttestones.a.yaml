@@ -1,5 +1,5 @@
 ---
-name:       TTestIS
+name:       TTestOneS
 namespace:  silkyR
 engineType: R
 
@@ -10,31 +10,25 @@ options:
         The data set as a data frame
 
     - name: vars
-      title: Variables
+      title: Paired Variables
       type: Variables
       description: >
         The variables of interest
-        
-    - name: groupingVar
-      title: Grouping variable
-      type: Variables
-      description: >
-        The grouping variable
         
     - name: student
       title: Student's test
       type: Bool
       default: true
       
-    - name: welch
-      title: Welch's test
+    - name: mann
+      title: Mann-Whitney U
       type: Bool
       default: false
       
-    - name: mann
-      title: Mann-Whitney U test
-      type: Bool
-      default: false
+    - name: testValue
+      title: Test Value
+      type: Number
+      default: 0
       
     - name: hypothesis
       title: Alternative hypothesis
@@ -52,11 +46,6 @@ options:
       type: Bool
       default: false
       
-    - name: equality
-      title: Equality of Variances assumption check
-      type: Bool
-      default: false
-        
     - name: meanDiff
       title: Mean and standard error difference
       type: Bool

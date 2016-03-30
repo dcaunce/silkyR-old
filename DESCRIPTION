@@ -21,3 +21,7 @@ Collate: utils.R
     descriptives.h.R
     ttestis.h.R
     ttestis.b.R
+    ttestps.b.R
+    ttestps.h.R
+    ttestones.h.R
+    ttestones.b.R

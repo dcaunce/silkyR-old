@@ -19,6 +19,7 @@ expect_equal(silkyFormatElement(15e7, w=10), "   1.50e+8")
 expect_equal(silkyFormatElement(-15e7, w=10, expw=4), " -1.50e +8")
 expect_equal(silkyFormatElement(0.8e-8, w=14, expw=8), "  8.00e     -9")
 
+expect_equal(silkyMeasureElements(0, sf=4), list(sf=4, dp=3, width=5, expwidth=3, supwidth=0))
 expect_equal(silkyMeasureElements(c(425, 70, 1), sf=4), list(sf=4, dp=3, width=7, expwidth=3, supwidth=0))
 expect_equal(silkyMeasureElements(c(1024, 70, 11), sf=4), list(sf=4, dp=2, width=7, expwidth=3, supwidth=0))
 expect_equal(silkyMeasureElements(c(1e8, -1e5), sf=4), list(sf=4, dp=0, width=8, expwidth=3, supwidth=0))

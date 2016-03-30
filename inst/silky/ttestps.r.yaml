@@ -1,17 +1,16 @@
 ---
-name: TTestIS
-title: Independent Samples T-Test
+name: TTestPS
+title: Paired Samples T-Test
 
 results:
     - name: ttest
-      title: Independent Samples T-Test
+      title: Paired Samples T-Test
       type: Table
-      rows: (vars)
+      rows: (length(vars)/2)
       
       columns:
         - name: name
           title: ""
-          content: (name)
           format: text
         
         - name: studTest
@@ -59,105 +58,55 @@ results:
           format: number
           visible: (ci && student)
           
-        - name: welchTest
+        - name: wilcoxonTest
           title: Test
-          content: Welch's
-          visible: (welch)
+          content: Wilcoxon
+          visible: (wilcoxon)
           
-        - name: welchT
-          title: t
-          format: number
-          visible: (welch)
-        
-        - name: welchDf
-          title: df
-          format: number
-          visible: (welch)
-
-        - name: welchP
-          title: p
-          format: number
-          visible: (welch)
-          
-        - name: welchMeanDiff
-          title: Mean difference
-          format: number
-          visible: (meanDiff && welch)
-          
-        - name: welchSEDiff
-          title: SE difference
-          format: number
-          visible: (meanDiff && welch)
-          
-        - name: welchEffectSize
-          title: Cohen's d
-          format: number
-          visible: (effectSize && Welchs)
-          
-        - name: welchLowerCI
-          title: Lower
-          format: number
-          visible: (ci && welch)
-          
-        - name: welchUpperCI
-          title: Upper
-          format: number
-          visible: (ci && welch)
-          
-        - name: mannTest
-          title: Test
-          content: Mann-Whitney
-          visible: (mann)
-          
-        - name: mannW
+        - name: wilcoxonW
           title: W
           format: number
-          visible: (mann)
+          visible: (wilcoxon)
 
-        - name: mannP
+        - name: wilcoxonP
           title: p
           format: number
-          visible: (mann)
+          visible: (wilcoxon)
           
-        - name: mannMeanDiff
+        - name: wilcoxonMeanDiff
           title: Mean difference
           format: number
-          visible: (meanDiff && mann)
+          visible: (meanDiff && wilcoxon)
           
-        - name: mannSEDiff
+        - name: wilcoxonSEDiff
           title: SE difference
           format: number
-          visible: (meanDiff && mann)
+          visible: (meanDiff && wilcoxon)
 
-        - name: mannEffectSize
+        - name: wilcoxonEffectSize
           title: Cohen's d
           format: number
-          visible: (effectSize && mann)
+          visible: (effectSize && wilcoxon)
           
-        - name: mannLowerCI
+        - name: wilcoxonLowerCI
           title: Lower
           format: number
-          visible: (ci && mann)
+          visible: (ci && wilcoxon)
           
-        - name: mannUpperCI
+        - name: wilcoxonUpperCI
           title: Upper
           format: number
-          visible: (ci && mann)
+          visible: (ci && wilcoxon)
           
     - name: normality
       title: Test of Normality (Shapiro-Wilk)
       type: Table
       visible: (norm)
-      rows: (rep(vars, each=2))
+      rows: (length(vars)/2)
       
       columns:
         - name: name
           title: ""
-          content: (name)
-          format: text
-          
-        - name: group
-          title: Group
           format: text
           
         - name: w
@@ -166,43 +115,17 @@ results:
           
         - name: p
           format: number
-          
-    - name: equalityofv
-      title: Test of Equality of Variances (Levene's)
-      type: Table
-      visible: (equality)
-      rows: (vars)
-      
-      columns:
-        - name: name
-          title: ""
-          content: (name)
-          format: text
-          
-        - name: f
-          title: "F"
-          format: number
-          
-        - name: df
-          format: number
-          
-        - name: p
-          format: number
 
     - name: descriptives
-      title: Group Descriptives
+      title: Descriptives
       type: Table
       visible: (desc)
-      rows: (rep(vars, each=2))
+      rows: (unique(vars))
       
       columns:
         - name: name
           title: ""
           content: (name)
-          format: text
-          
-        - name: group
-          title: Group
           format: text
           
         - name: num
