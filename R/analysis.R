@@ -2,12 +2,13 @@
 Analysis <- setRefClass(
     "Analysis",
     fields=list(
+        .id="numeric",
         .name="character",
         .package="character",
         .options="Options",
         .results="Results"),
     methods=list(
-        initialize=function(options=NULL) {
+        initialize=function(id=0, options=NULL) {
 
             selfClass <- class(.self)
             name <- selfClass
@@ -15,6 +16,8 @@ Analysis <- setRefClass(
             
             .name    <<- name
             .package <<- attr(selfClass, 'package')
+            
+            .id <<- id
             
             if (is.null(options))
                 options <- Options()
@@ -48,5 +51,12 @@ Analysis <- setRefClass(
         .optionsChangedHandler=function(optionNames) {
             check()
             .results$.update()
+        },
+        asProtoBuf=function() {
+            response <- RProtoBuf::new(silkycoms.AnalysisResponse)
+            response$id = .id
+            response$results <- .results$asProtoBuf();
+            response$status <- silkycoms.AnalysisStatus$ANALYSIS_COMPLETE
+            response
         })
 )

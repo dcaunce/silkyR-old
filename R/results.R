@@ -47,6 +47,12 @@ ResultElement <- setRefClass(
                 value <- def[[name]]
                 .setDef(name, value)
             }
+        },
+        asString=function() {
+            ""
+        },
+        show=function() {
+            cat(.self$asString())
         }
     ))
 
@@ -85,21 +91,48 @@ Results <- setRefClass(
             for (element in .elements)
                 element$.update()
         },
-        show=function() {
-
-            cat("\n\n ")
-            cat(toupper(.title))
-            cat("\n")
-
-            for (element in .elements)
-                element$show()
-
-            cat("\n\n")
-        },
         append=function(element) {
             .elements[[element$name()]] <<- element
         },
         get=function(name) {
             .elements[[name]]
+        },
+        show=function() {
+            cat(.self$asString())
+        },
+        asString=function() {
+            
+            pieces <- character()
+            
+            pieces <- c(pieces, '\n\n ', toupper(.title), '\n')
+            
+            for (element in .elements)
+                if (element$visible())
+                    pieces <- c(pieces, element$asString())
+                                
+            pieces <- c(pieces, '\n\n')
+            
+            return(paste0(pieces, collapse=''))
+        },
+        asProtoBuf=function() {
+            
+            initProtoBuf()
+            
+            resultsBuf <- RProtoBuf::new(silkycoms.AnalysisResponse.Results)
+            
+            for (element in .elements) {
+                
+                elem <- RProtoBuf::new(silkycoms.ResultsElement,
+                    name=element$.name,
+                    title=element$.title,
+                    status=silkycoms.AnalysisStatus$ANALYSIS_COMPLETE,
+                    text=element$asString())
+                
+                resultsBuf$add("elements", elem)
+                
+                #resultsBuf$add("elements", element$asProtoBuf())
+            }
+            
+            resultsBuf
         })
 )

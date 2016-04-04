@@ -17,23 +17,25 @@ Cell <- setRefClass(
         },
         asProtoBuf=function() {
             initProtoBuf()
-            cell <- methods::new(silky.Cell)
+            cell <- RProtoBuf::new(silkycoms.ResultsCell)
             
             vc <- class(value)
             
             if (vc == "integer") {
                 if (.value == -2147483647)
-                    cell$o <- silky.Cell.Other.MISSING
+                    cell$o <- silkycoms.Cell.Other.MISSING
                 else
                     cell$i <- value
             } else if (vc == "numeric")
-                cell$f <- value
+                cell$d <- value
             else if (vc == "")
                 cell$s <- value
             else
-                cell$o <- silky.Cell.Other$NAN
+                cell$o <- silkycoms.Cell.Other$NOT_A_NUMBER
             
             cell$footnotes <- sups
+            
+            cell
         })
 )
 
@@ -110,26 +112,33 @@ Column <- setRefClass(
         visible=function() {
             .options$eval(.visibleExpr)
         },
-        printTitle=function(width=NULL) {
+        .titleForPrint=function(width=NULL) {
+            
             if (is.null(width))
                 width <- .self$width()
             w <- nchar(.title)
             pad <- spaces(max(0, width - w))
-            cat(paste0(.title, pad))
+            
+            paste0(.title, pad)
         },
-        printCell=function(i, measures=NULL) {
+        .cellForPrint=function(i, measures=NULL) {
             if ( ! .measured)
                 .measure()
             
             if (is.null(measures))
                 measures <- .measures
             
-            cat(silkyFormatElement(.cells[[i]], w=measures$width, dp=measures$dp, sf=measures$sf, expw=measures$expwidth, supw=measures$supwidth))
+            silkyFormatElement(.cells[[i]],
+                w=measures$width,
+                dp=measures$dp,
+                sf=measures$sf,
+                expw=measures$expwidth,
+                supw=measures$supwidth)
         },
         asProtoBuf=function() {
             initProtoBuf()
             
-            column <- methods::new(silky.Column,
+            column <- RProtoBuf::new(silkycoms.ResultsColumn,
                 name=.name,
                 title=.title,
                 format=.format)

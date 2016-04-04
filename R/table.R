@@ -187,12 +187,9 @@ Table <- setRefClass(
         getRows=function() {
             
             rows <- list()
-            i <- 1
             
-            while (i <= .rowCount) {
+            for (i in seq_len(.rowCount))
                 rows[[i]] <- getRow(i)
-                i <- i + 1
-            }
             
             rows
         },
@@ -235,7 +232,7 @@ Table <- setRefClass(
             } else {
                 
                 w <- .padding + .widthWidestHeader() + .padding
-                for (i in 1:.rowCount)
+                for (i in seq_len(.rowCount))
                     w <- w + .padding + .widthWidestCellInRow(i)$width + .padding
             }
             
@@ -268,83 +265,92 @@ Table <- setRefClass(
             
             width
         },
-        show=function() {
-            cat('\n')
-            printTitle()
-            printHeaders()
+        asString=function() {
+            
+            pieces <- character()
+            
+            pieces <- c(pieces, .titleForPrint())
+            pieces <- c(pieces, .headerForPrint())
             i <- 1
             
             if ( ! .self$.swapRowsColumns) {
-            
+                
                 for (i in seq_len(.rowCount))
-                    printRow(i)
-
+                    pieces <- c(pieces, .rowForPrint(i))
+                
             } else {
                 
                 for (i in seq_along(.columns)) {
                     if (i == 1)
                         next()  # the first is already printed in the header
                     if (.columns[[i]]$visible())
-                        printRow(i)
+                        pieces <- c(pieces, .rowForPrint(i))
                 }
             }
-                
-            printFooter()
-            cat('\n')
+            
+            pieces <- c(pieces, .footerForPrint())
+            pieces <- c(pieces, '\n')
+            
+            paste0(pieces, collapse="")
         },
-        printTitle=function() {
+        .titleForPrint=function() {
+            
+            pieces <- character()
+            
             w <- nchar(.title)
             wid <- width()
             padright <- repstr(' ', wid - w)
-            cat(paste0(.marstr, .title, padright, .marstr, '\n'))
-            cat(.marstr)
-            cat(repstr('\u2500', wid))
-            cat(.marstr)
-            cat('\n')
+            
+            pieces <- c(pieces, '\n')
+            pieces <- c(pieces, .marstr, .title, padright, .marstr, '\n')
+            pieces <- c(pieces, .marstr, repstr('\u2500', wid), .marstr, '\n')
+            
+            paste0(pieces, collapse="")
         },
-        printHeaders=function() {
+        .headerForPrint=function() {
+            
+            pieces <- character()
+            
             wid <- width()
-            cat(.marstr)
+            pieces <- c(pieces, .marstr)
             
             if ( ! .swapRowsColumns) {
             
                 for (column in .columns) {
-                    if (column$visible()) {
-                        cat(.padstr)
-                        column$printTitle()
-                        cat(.padstr)
-                    }
+                    if (column$visible())
+                        pieces <- c(pieces, .padstr, column$.titleForPrint(), .padstr)
                 }
                 
             } else {
                 
                 column <- .columns[[1]]
                 
-                cat(.padstr)
-                cat(spaces(.widthWidestHeader()))
-                cat(.padstr)
+                pieces <- c(pieces, .padstr, spaces(.widthWidestHeader()), .padstr)
                 
-                for (i in 1:.rowCount) {
+                for (i in seq_len(.rowCount)) {
                     text <- paste(column$.getCell(i)$value)
                     rowWidth <- .widthWidestCellInRow(i)$width
                     w <- nchar(text)
                     pad <- spaces(max(0, rowWidth - w))
-                    cat(paste0(.padstr, text, pad, .padstr))
+                    
+                    pieces <- c(pieces, .padstr, text, pad, .padstr)
                 }
             }
-            cat(.marstr)
-            cat('\n')
-            cat(.marstr)
-            cat(repstr('\u2500', wid))
-            cat(.marstr)
-            cat('\n')
+            
+            pieces <- c(pieces, .marstr, '\n')
+            
+            pieces <- c(pieces, .marstr, repstr('\u2500', wid), .marstr, '\n')
+            
+            paste0(pieces, collapse="")
         },
-        printFooter=function() {
+        .footerForPrint=function() {
+            
+            pieces <- character()
+            
             wid <- width()
-            cat(.marstr)
-            cat(repstr('\u2500', wid))
-            cat(.marstr)
-            cat('\n')
+            
+            pieces <- c(.marstr, repstr('\u2500', wid), .marstr, '\n')
+            
             for (i in seq_along(.footnotes$.notes)) {
                 
                 # determine if the corresponding superscript is visible
@@ -372,35 +378,34 @@ Table <- setRefClass(
                     first <- TRUE
                     
                     for (line in lines) {
-                        cat(.marstr)
+                        
+                        pieces <- c(pieces, .marstr)
                         
                         if (first) {
-                            cat(.SUPCHARS[i])
-                            cat(' ')
+                            pieces <- c(pieces, .SUPCHARS[i], ' ')
                             first <- FALSE
                         } else {
-                            cat('  ')
+                            pieces <- c(pieces, '  ')
                         }
                         
-                        cat(line)
-                        cat(.marstr)
-                        cat('\n')
+                        pieces <- c(pieces, line, .marstr, '\n')
                     }
                 }
-                
             }
+            
+            paste0(pieces, collapse="")
         },
-        printRow=function(i) {
-            cat(.marstr)
+        .rowForPrint=function(i) {
+            
+            pieces <- character()
+            
+            pieces <- c(pieces, .marstr)
             
             if ( ! .swapRowsColumns) {
             
                 for (column in .columns) {
-                    if (column$visible()) {
-                        cat(.padstr)
-                        column$printCell(i)
-                        cat(.padstr)
-                    }
+                    if (column$visible())
+                        pieces <- c(pieces, .padstr, column$.cellForPrint(i), .padstr)
                 }
                 
             } else {
@@ -408,38 +413,42 @@ Table <- setRefClass(
                 column <- .columns[[i]]
                 
                 width <- .widthWidestHeader()
-                cat(.padstr)
-                column$printTitle(width)
-                cat(.padstr)
+                
+                pieces <- c(pieces, .padstr, column$.titleForPrint(width), .padstr)
                 
                 for (j in seq_along(column$.cells)) {
                     widest <- .widthWidestCellInRow(j)
                     width <- widest$width
                     supwidth <- widest$supwidth
                     
-                    cat(.padstr)
                     cell <- column$.cells[[j]]
                     measurements <- silkyMeasureElements(list(cell))
                     measurements$width <- max(measurements$width, width)
                     measurements$supwidth  <- supwidth
-                    column$printCell(j, measurements)
-                    cat(.padstr)
+                    
+                    pieces <- c(pieces, .padstr, column$.cellForPrint(j, measurements), .padstr)
                 }
                 
             }
-            cat(.marstr)
-            cat('\n')
+            
+            pieces <- c(pieces, .marstr, '\n')
+            
+            paste0(pieces, collapse="")
         },
         asProtoBuf=function() {
             initProtoBuf()
-            table <- methods::new(silky.Table,
-                name=.name,
-                title=.title)
+            
+            table <- RProtoBuf::new(silkycoms.ResultsTable)
             
             for (column in .columns)
                 table$add("columns", column$asProtoBuf())
+    
+            element <- RProtoBuf::new(silkycoms.ResultsElement,
+                name=.name,
+                title=.title,
+                table=table)
             
-            table
+            element
         }
     )
 )
@@ -538,14 +547,30 @@ Tables <- setRefClass(
             .tableNames <<- character()
             .tables <<- list()
         },
-        show=function() {
-            cat(' ')
-            cat(.title)
-            cat("\n")
+        asString=function() {
+            
+            pieces <- c(' ', .title, '\n')
+            
             for (table in .tables) {
                 if (table$visible())
-                    table$show()
+                    pieces <- c(pieces, table$asString())
             }
+            
+            return(paste0(pieces, collapse=""))
+        },
+        asProtoBuf=function() {
+            initProtoBuf()
+            
+            group <- RProtoBuf::new(silkycoms.ResultsGroup)
+            
+            for (table in .tables)
+                group$add("elements", table$asProtoBuf())
+            
+            RProtoBuf::new(silkycoms.ResultsElement,
+                name=.name,
+                title=.title,
+                group=group)
+            
         })
 )
 

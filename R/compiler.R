@@ -204,6 +204,8 @@ generateHeader <- function(path, info) {
                 def <- ifelse(option$default, "TRUE", "FALSE")
             else if (option$type == "List")
                 def <- paste0('"', option$def, '"')
+            else if (option$type == "Terms")
+                def <- "list()"
             else
                 def <- option$default
             
