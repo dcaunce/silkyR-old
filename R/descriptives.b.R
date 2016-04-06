@@ -16,30 +16,34 @@ Descriptives <- setRefClass(
                 name   <- .options$values()$vars[[i]]
                 column <- na.omit(dataset[[name]])
                 
-                if (is.numeric(column)) {
-                    desc$setCell(i, "mean", mean(column))
-                    desc$setCell(i, "median", median(column))
+                if (silkyR::canBeNumeric(column)) {
                     
-                    mode <- as.numeric(names(table(column)[table(column)==max(table(column))]))
+                    numColumn <- as.numeric(column)
+                    
+                    desc$setCell(i, "mean", mean(numColumn))
+                    desc$setCell(i, "median", median(numColumn))
+                    
+                    mode <- as.numeric(names(table(numColumn)[table(numColumn)==max(table(numColumn))]))
                     desc$setCell(i, "mode", mode[1])
                     
-                    desc$setCell(i, "sum", sum(column))
-                    desc$setCell(i, "sd", sd(column))
-                    desc$setCell(i, "variance", var(column))
-                    desc$setCell(i, "range", max(column)-min(column))
-                    desc$setCell(i, "min", min(column))
-                    desc$setCell(i, "max", max(column))
-                    desc$setCell(i, "se", sqrt(var(column)/length(column)))
+                    desc$setCell(i, "sum", sum(numColumn))
+                    desc$setCell(i, "sd", sd(numColumn))
+                    desc$setCell(i, "variance", var(numColumn))
+                    desc$setCell(i, "range", max(numColumn)-min(numColumn))
+                    desc$setCell(i, "min", min(numColumn))
+                    desc$setCell(i, "max", max(numColumn))
+                    desc$setCell(i, "se", sqrt(var(numColumn)/length(numColumn)))
                     
-                    deviation <- column-mean(column)
-                    desc$setCell(i, "skew", sum(deviation^3)/(length(column)*sd(column)^3))
-                    desc$setCell(i, "kurt", sum(deviation^4)/(length(column)*var(column)^2))
+                    deviation <- numColumn-mean(numColumn)
+                    desc$setCell(i, "skew", sum(deviation^3)/(length(numColumn)*sd(numColumn)^3))
+                    desc$setCell(i, "kurt", sum(deviation^4)/(length(numColumn)*var(numColumn)^2))
                     
-                    desc$setCell(i, "quart1", quantile(column, c(.25)))
-                    desc$setCell(i, "quart2", quantile(column, c(.5)))
-                    desc$setCell(i, "quart3", quantile(column, c(.75)))
+                    desc$setCell(i, "quart1", quantile(numColumn, c(.25)))
+                    desc$setCell(i, "quart2", quantile(numColumn, c(.5)))
+                    desc$setCell(i, "quart3", quantile(numColumn, c(.75)))
                     
                 } else {
+                    
                     mode <- NULL
                     
                     desc$setCell(i, "mean", "")
@@ -61,17 +65,20 @@ Descriptives <- setRefClass(
                     desc$setCell(i, "quart1", "")
                     desc$setCell(i, "quart2", "")
                     desc$setCell(i, "quart3", "")
+                }
+                
+                cumCount <- 0
+                levels <- base::levels(column)
+                freqTable <- freq$get(name)
+                
+                for (j in seq_along(levels)) {
                     
-                    cumCount <- 0
-                    for (k in seq_along(levels(column))) {
-                        
-                        count <- sum(column==levels(column)[k])
-                        cumCount <- cumCount + count
-                        
-                        freq$get(name)$setCell(k, "counts", count)
-                        freq$get(name)$setCell(k, "percentage", 100*count/length(column))
-                        freq$get(name)$setCell(k, "cumpercentage", 100*cumCount/length(column))
-                    }
+                    count <- sum(column == levels[j])
+                    cumCount <- cumCount + count
+                    
+                    freqTable$setCell(j, "counts", count)
+                    freqTable$setCell(j, "percentage", 100*count/length(column))
+                    freqTable$setCell(j, "cumpercentage", 100*cumCount/length(column))
                 }
                 
                 if (length(mode) > 1)

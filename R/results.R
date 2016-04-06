@@ -7,7 +7,8 @@ ResultElement <- setRefClass(
         .title="character",
         .index="integer",
         .visible="character",
-        .options="Options"),
+        .options="Options",
+        .updated="logical"),
     methods=list(
         initialize=function(name="", index=0, options=Options()) {
             .name <<- name
@@ -15,6 +16,7 @@ ResultElement <- setRefClass(
             .index <<- as.integer(index)
             .options <<- options
             .visible <<- paste0(TRUE)
+            .updated <<- FALSE
             
             .options$addChangeListener(.self$.optionsChanged)
         },
@@ -23,16 +25,18 @@ ResultElement <- setRefClass(
         },
         visible=function() {
             vis <- .options$eval(.visible, name=.name, index=.index)
+            print("visible")
+            print(vis)
             if (is.logical(vis))
                 return(vis)
             else
-                return( ! is.null(vis))
+                return(length(vis) > 0)
         },
         .update=function() {
-            
+            .updated <<- TRUE
         },
         .optionsChanged=function(...) {
-            .update()
+            .updated <<- FALSE
         },
         .has=function(name) {
             paste0(".", name) %in% names(.self$getRefClass()$fields())
@@ -41,7 +45,7 @@ ResultElement <- setRefClass(
             if (.has(name))
                 field(paste0(".", name), value)
         },
-        .init=function(def) {
+        .setup=function(def) {
             
             for (name in names(def)) {
                 value <- def[[name]]
@@ -82,7 +86,7 @@ Results <- setRefClass(
                 for (def in info$results) {
                     
                     element <- methods::new(def$type, def$name, options=.options)
-                    element$.init(def)
+                    element$.setup(def)
                     .self$append(element)
                 }
             }
@@ -121,6 +125,9 @@ Results <- setRefClass(
             resultsBuf <- RProtoBuf::new(silkycoms.AnalysisResponse.Results)
             
             for (element in .elements) {
+                
+                if (element$visible() == FALSE)
+                    next()
                 
                 elem <- RProtoBuf::new(silkycoms.ResultsElement,
                     name=element$.name,

@@ -25,9 +25,12 @@ columns <- list(
 table <- Table(options=options)
 table$.setDef("title", "Bruce")
 table$.setDef("columns", columns)
+table$.update()
 
-expect_error(table$.setDef("rows", "(notexist)"), "Error : Could not evaluate '(notexist)'\n    object 'notexist' not found\n", fixed=TRUE)
-expect_silent(table$.setDef("rows", "(vars)"))
+table$.setDef("rows", "(notexist)")
+expect_error(table$.update(), "Error : Could not evaluate '(notexist)'\n    object 'notexist' not found\n", fixed=TRUE)
+table$.setDef("rows", "(vars)")
+expect_silent(table$.update())
 expect_equal(table$rowCount(), 3)
 
 table$setCell(1, "value", 16)

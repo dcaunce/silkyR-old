@@ -76,7 +76,7 @@ Table <- setRefClass(
         },
         .setRowsDef=function(value) {
             .rowsExpr <<- paste0(value)
-            .update()
+            .updated <<- FALSE
         },
         .setColumnsDef=function(columnDefs) {
             
@@ -93,6 +93,9 @@ Table <- setRefClass(
             }
         },
         .update=function() {
+            
+            if (.updated)
+                return()
             
             error <- NULL
 
@@ -139,6 +142,8 @@ Table <- setRefClass(
             
             if ( ! is.null(error))
                 rethrow(error)
+            
+            .updated <<- TRUE
         },
         clearRows=function() {
             .rowNames <<- list()
@@ -487,14 +492,17 @@ Tables <- setRefClass(
         },
         .setTemplateDef=function(templateDef) {
             .template <<- templateDef
-            .update()
+            .updated <<- FALSE
         },
         .setTablesDef=function(tablesExpr) {
             .tablesExpr <<- paste0(tablesExpr)
-            .update()
+            .updated <<- FALSE
         },
         .update=function() {
             
+            if (.updated)
+                return()
+
             if (length(.template) == 0)
                 return()
             
@@ -530,18 +538,23 @@ Tables <- setRefClass(
                 
                 if (length(index) > 0) {
                     
-                    .tables[[i]] <<- oldTables[[ index[1] ]]
+                    table <- oldTables[[ index[1] ]]
+                    table$.update()
+                    .tables[[i]] <<- table
                     
                 } else {
                     
                     table <- Table(newName, i, .options)
-                    table$.init(.template)
+                    table$.setup(.template)
+                    table$.update()
                     .tables[[i]] <<- table
                 }
             }
             
             if ( ! is.null(error))
                 rethrow(error)
+            
+            .updated <<- TRUE
         },
         clear=function() {
             .tableNames <<- character()

@@ -370,7 +370,7 @@ extractErrorMessage <- function(error) {
     
     split <- base::strsplit(as.character(error), ":")[[1]]
     last <- split[[length(split)]]
-    stringr::str_trim(last)
+    base::trimws(last)
 }
 
 rethrow <- function(error) {

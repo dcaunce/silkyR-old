@@ -6,7 +6,8 @@ Analysis <- setRefClass(
         .name="character",
         .package="character",
         .options="Options",
-        .results="Results"),
+        .results="Results",
+        .read="ANY"),
     methods=list(
         initialize=function(id=0, options=NULL) {
 
@@ -31,10 +32,11 @@ Analysis <- setRefClass(
             silkyR::check(.package, .name, .options)
         },
         init=function() {
-            check()
+            .self$check()
+            .results$.update()
         },
         run=function() {
-            check()
+            .self$init()
         },
         dataset=function() {
             .dataset
@@ -47,6 +49,26 @@ Analysis <- setRefClass(
         },
         show=function() {
             .results$show()
+        },
+        .setReadDataset=function(read) {
+            .read <<- read
+        },
+        .readDataset=function() {
+
+            columns <- character()
+            
+            env <- .options$values()
+            info <- loadAnalysisInfo(.package, .name)
+            
+            for (opt in info$options) {
+                
+                if (opt$type == "Variables" || opt$type == "Variable") {
+                    value <- env[[opt$name]]
+                    columns <- c(columns, value)
+                }
+            }
+
+            .options$set(dataset=.self$.read(columns))
         },
         .optionsChangedHandler=function(optionNames) {
             check()
