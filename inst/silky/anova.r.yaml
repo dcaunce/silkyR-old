@@ -1,0 +1,34 @@
+---
+name: ANOVA
+title: ANOVA
+
+results:
+    - name: anova
+      title: ANOVA
+      type: Table
+      rows: (c(sapply(modelTerms, paste, collapse=" * "),"Residual"))
+      
+      columns:
+        - name: cases
+          title: Cases
+          content: (name)
+          format: text
+          
+        - name: sumSquares
+          title: Sum of Squares
+          format: number
+          
+        - name: df
+          format: number
+          
+        - name: meanSquares
+          title: Mean Square
+          format: number
+          
+        - name: f
+          title: F
+          format: number
+          
+        - name: p
+          format: number
+          

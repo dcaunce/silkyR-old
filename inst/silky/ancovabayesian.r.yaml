@@ -1,0 +1,17 @@
+---
+name: ANCOVABayesian
+title: Bayesian ANCOVA
+
+results:
+    - name: ancovaB
+      title: Bayesian ANCOVA
+      type: Table
+      rows: (1)
+      
+      columns:
+        - name: cases
+          title: Cases
+          content: (name)
+          format: text
+
+          

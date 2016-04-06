@@ -1,0 +1,53 @@
+---
+name:       ANOVA
+namespace:  silkyR
+engineType: R
+
+options:
+    - name: dataset
+      type: Dataset
+      description: >
+        The data set as a data frame
+
+    - name: dependentVar
+      title: Dependent Variable
+      type: Variable
+      description: >
+        The variable of interest
+        
+    - name: factors
+      title: Fixed Factors
+      type: Variables
+        
+    - name: modelTerms
+      title: Model Terms
+      type: Terms
+      description: >
+        Terms for main effects are specified by the factor name from the dataset. Interaction terms are specified by an asterisk between factors i.e. "factor1 * factor2"
+        
+    - name: sumSquares
+      title: Sum of Squares
+      type: List
+      options: 
+        - type1
+        - type2
+        - type3
+      default: type3
+      
+    - name: ci
+      title: Confidence Interval
+      type: Bool
+      default: false
+      
+    - name: ciWidth
+      title: Confidence level
+      type: Number
+      min: 50
+      max: 99.9
+      default: 95
+      
+    - name: desc
+      title: Descriptives Table
+      type: Bool
+      default: false
+      

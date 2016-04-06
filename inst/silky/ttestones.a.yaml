@@ -10,7 +10,7 @@ options:
         The data set as a data frame
 
     - name: vars
-      title: Paired Variables
+      title: Variables
       type: Variables
       description: >
         The variables of interest

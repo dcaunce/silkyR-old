@@ -84,7 +84,7 @@ TTestPS <- setRefClass(
                     normality$addFootnote(i, "name", "Too many observations (N > 5000) to compute statistic")
                     res$statistic <- ""
                     res$p.value <- ""
-                } else if ((column1[n]-column2[n])-(column1[1L]-column2[1L]) == 0) {
+                } else if ((max(column1)-max(column2))-(min(column1)-min(column2)) == 0) {
                     reject("'{a} - {b}' is essentially constant", code="constant_variable", a=name1, b=name2)
                 }
                 else {

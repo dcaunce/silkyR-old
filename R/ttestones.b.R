@@ -69,7 +69,7 @@ TTestOneS <- setRefClass(
                     normality$addFootnote(i, "name", "Too many observations (N > 5000) to compute statistic")
                     res$statistic <- ""
                     res$p.value <- ""
-                } else if (column[n]-column[1L] == 0) {
+                } else if (max(column)-min(column) == 0) {
                     reject("Variable '{a}' has essentially constant values", code="constant_variable", a=name)
                 }
                 else {
